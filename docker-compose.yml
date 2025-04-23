@@ -1,0 +1,259 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+# Basic Airflow cluster configuration for CeleryExecutor with Redis, PostgreSQL, and MySQL.
+# WARNING: This configuration is for local development. Do not use it in a production deployment.
+
+---
+x-airflow-common:
+  &airflow-common
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.8.1}
+  # build: . # Uncomment if you build your own image
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+    AIRFLOW__CORE__FERNET_KEY: '' # Set variable manually or run 'airflow key generate'
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false' # Set to 'true' to load example DAGs
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+  volumes:
+    # ****** INICIO DE LA MODIFICACIÓN ORIGINAL DEL USUARIO ******
+    - ~/airflow/dags:/opt/airflow/dags       # Usa ruta absoluta desde home
+    - ~/airflow/logs:/opt/airflow/logs       # Usa ruta absoluta desde home
+    - ~/airflow/config:/opt/airflow/config   # Usa ruta absoluta desde home
+    - ~/airflow/plugins:/opt/airflow/plugins # Usa ruta absoluta desde home
+    - ./requirements.txt:/requirements.txt # Monta requirements.txt si existe
+  user: "${AIRFLOW_UID:-50000}:0"      # Corre como el UID del host (leído de .env)
+  depends_on:
+    &airflow-common-depends-on
+    redis:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
+    # --- INICIO: Dependencia MySQL añadida ---
+    mysql_mymind:
+      condition: service_healthy
+    # --- FIN: Dependencia MySQL añadida ---
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres_airflow_meta # Nombre opcional del contenedor
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+
+  redis:
+    image: redis:latest
+    container_name: redis_airflow_broker # Nombre opcional del contenedor
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+      start_period: 30s
+    restart: always
+
+  # --- INICIO: Servicio MySQL añadido ---
+  mysql_mymind: # Nombre del servicio para MySQL
+    image: mysql:8.0 # Puedes usar una versión específica si lo prefieres
+    container_name: mysql_mymind_db # Nombre opcional del contenedor
+    environment:
+      # Define estas variables en tu archivo .env para seguridad
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword} # ¡Cambia esto en .env!
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mymind_dw} # Nombre de la base de datos destino
+      MYSQL_USER: ${MYSQL_USER:-airflow_user} # Usuario que usará Airflow para conectarse
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-airflow_pass} # Contraseña para el usuario de Airflow ¡Cambia esto en .env!
+    volumes:
+      - mysql-data-volume:/var/lib/mysql # Volumen para persistencia de datos
+    ports:
+      - "3307:3306" # Expone el puerto 3306 de MySQL al puerto 3307 del host (opcional)
+    healthcheck:
+      # Usamos el usuario root y su password para el healthcheck
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s # Darle un poco más de tiempo para iniciar
+    restart: always
+  # --- FIN: Servicio MySQL añadido ---
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on # Hereda redis, postgres, mysql
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"] # Actualizado para Airflow >= 2.8
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on # Hereda redis, postgres, mysql
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.providers.celery.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}" || celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    environment:
+      <<: *airflow-common-env
+      # El flag DUMB_INIT_SETSID=0 puede ser necesario en algunos entornos para que el worker maneje señales correctamente
+      DUMB_INIT_SETSID: "0"
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on # Hereda redis, postgres, mysql
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-triggerer:
+    <<: *airflow-common
+    command: triggerer
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on # Hereda redis, postgres, mysql
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        # Verifica AIRFLOW_UID (¡Importante!)
+        if [[ -z "${AIRFLOW_UID}" ]]; then
+          echo; echo -e "\033[1;33mWARNING!!!: AIRFLOW_UID not set!\e[0m"; echo "For Linux, create .env file with: echo -e \"AIRFLOW_UID=$$(id -u)\" > .env"; echo "See: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#setting-the-right-airflow-user"; echo
+        fi
+        # Verifica recursos (Opcional, puedes quitarlo si no lo necesitas)
+        # ... (verificación de recursos original omitida por brevedad, puedes mantenerla si quieres) ...
+        # Crea directorios en el host (mapeados a /sources) y ajusta permisos
+        # Ya no es necesario crear los directorios aquí si los montas directamente como en tu config original
+        # mkdir -p /sources/logs /sources/dags /sources/plugins
+        # chown -R "${AIRFLOW_UID:-50000}:0" /sources/{logs,dags,plugins} # Usa AIRFLOW_UID para permisos
+        # Ejecuta inicialización/migración de Airflow DB y creación de usuario
+        exec /entrypoint airflow db migrate && airflow users create --role Admin --username "${_AIRFLOW_WWW_USER_USERNAME:-airflow}" --password "${_AIRFLOW_WWW_USER_PASSWORD:-airflow}" --email admin@example.com --firstname Admin --lastname Admin || airflow users list # Crea usuario o lista si ya existe
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: 'true' # Asegura que la DB se migre
+      _AIRFLOW_WWW_USER_CREATE: 'true' # Intenta crear el usuario admin
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: '' # Limpiado aquí, usa la var global si es necesario
+    user: "0:0" # Corre init como root para poder hacer chown y otras tareas iniciales si fueran necesarias
+    # Los volumes del common no se aplican directamente aquí, pero los mapeos ya están
+    # Asegúrate que los volúmenes de dags, logs, etc. estén definidos en `x-airflow-common`
+    depends_on: # airflow-init también debe esperar a las bases de datos
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy # Aunque init no usa redis directamente, es buena práctica esperar
+      # --- INICIO: Dependencia MySQL añadida a init ---
+      mysql_mymind:
+        condition: service_healthy # Espera a MySQL también, aunque init no interactúe directamente
+      # --- FIN: Dependencia MySQL añadida a init ---
+
+
+  airflow-cli:
+    <<: *airflow-common
+    profiles:
+      - debug # Solo se activa si usas --profile debug
+    environment:
+      <<: *airflow-common-env
+      CONNECTION_CHECK_MAX_COUNT: "0" # Deshabilita chequeos de conexión al iniciar CLI
+    command: bash # Proporciona un shell para comandos CLI
+    depends_on: # CLI también necesita que todo esté listo
+      <<: *airflow-common-depends-on # Hereda redis, postgres, mysql
+      airflow-init:
+        condition: service_completed_successfully
+
+
+  flower: # Flower necesita el broker (redis) y opcionalmente la BD de resultados (postgres)
+    <<: *airflow-common
+    command: celery flower
+    profiles:
+      - flower # Solo se activa si usas --profile flower
+    ports:
+      - "5555:5555"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+    depends_on:
+      # Flower depende principalmente del broker (Redis) y de que los workers estén potencialmente listos
+      redis:
+        condition: service_healthy
+      postgres: # Puede necesitar acceso a la BD de resultados
+        condition: service_healthy
+      # No necesita mysql directamente, pero sí que airflow-init haya terminado
+      airflow-init:
+        condition: service_completed_successfully
+      # Podrías añadir dependencia de airflow-worker si quieres asegurarte que haya workers antes de verlos en Flower
+
+volumes:
+  postgres-db-volume: {} # Volumen para PostgreSQL
+  mysql-data-volume: {}  # Volumen para MySQL

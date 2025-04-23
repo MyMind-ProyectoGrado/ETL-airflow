@@ -1,0 +1,45 @@
+[2025-04-15T20:57:59.397+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.extract_mongo_data manual__2025-04-15T20:45:09.888156+00:00 [queued]>
+[2025-04-15T20:57:59.405+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.extract_mongo_data manual__2025-04-15T20:45:09.888156+00:00 [queued]>
+[2025-04-15T20:57:59.406+0000] {taskinstance.py:2170} INFO - Starting attempt 2 of 2
+[2025-04-15T20:57:59.420+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): extract_mongo_data> on 2025-04-15 20:45:09.888156+00:00
+[2025-04-15T20:57:59.425+0000] {standard_task_runner.py:60} INFO - Started process 1041 to run task
+[2025-04-15T20:57:59.428+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'extract_mongo_data', 'manual__2025-04-15T20:45:09.888156+00:00', '--job-id', '14', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmplwzevgg2']
+[2025-04-15T20:57:59.430+0000] {standard_task_runner.py:88} INFO - Job 14: Subtask extract_mongo_data
+[2025-04-15T20:57:59.484+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.extract_mongo_data manual__2025-04-15T20:45:09.888156+00:00 [running]> on host 64c6827685b2
+[2025-04-15T20:57:59.580+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='extract_mongo_data' AIRFLOW_CTX_EXECUTION_DATE='2025-04-15T20:45:09.888156+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-04-15T20:45:09.888156+00:00'
+[2025-04-15T20:57:59.581+0000] {mymind_etl_dag.py:44} INFO - Iniciando extracción desde MongoDB (usando MongoClient directo)...
+[2025-04-15T20:57:59.582+0000] {mymind_etl_dag.py:49} INFO - Obteniendo detalles de conexión para mongo_mymind...
+[2025-04-15T20:57:59.595+0000] {base.py:83} INFO - Using connection ID 'mongo_mymind' for task execution.
+[2025-04-15T20:57:59.596+0000] {mymind_etl_dag.py:55} INFO - URI obtenida de la conexión.
+[2025-04-15T20:57:59.597+0000] {mymind_etl_dag.py:61} INFO - Timeouts - Connect: 10000ms, ServerSelect: 30000ms
+[2025-04-15T20:57:59.597+0000] {mymind_etl_dag.py:64} INFO - Creando instancia de MongoClient...
+[2025-04-15T20:57:59.598+0000] {mymind_etl_dag.py:121} ERROR - Error de PyMongo al conectar o ejecutar operación: Invalid URI scheme: URI must begin with 'mongodb://' or 'mongodb+srv://'
+Traceback (most recent call last):
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 65, in extract_mongo_data
+    client = MongoClient(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 780, in __init__
+    res = uri_parser.parse_uri(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/uri_parser.py", line 502, in parse_uri
+    raise InvalidURI(f"Invalid URI scheme: URI must begin with '{SCHEME}' or '{SRV_SCHEME}'")
+pymongo.errors.InvalidURI: Invalid URI scheme: URI must begin with 'mongodb://' or 'mongodb+srv://'
+[2025-04-15T20:57:59.600+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 65, in extract_mongo_data
+    client = MongoClient(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 780, in __init__
+    res = uri_parser.parse_uri(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/uri_parser.py", line 502, in parse_uri
+    raise InvalidURI(f"Invalid URI scheme: URI must begin with '{SCHEME}' or '{SRV_SCHEME}'")
+pymongo.errors.InvalidURI: Invalid URI scheme: URI must begin with 'mongodb://' or 'mongodb+srv://'
+[2025-04-15T20:57:59.610+0000] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=mymind_mongo_to_mysql_etl, task_id=extract_mongo_data, execution_date=20250415T204509, start_date=20250415T205759, end_date=20250415T205759
+[2025-04-15T20:57:59.627+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 14 for task extract_mongo_data (Invalid URI scheme: URI must begin with 'mongodb://' or 'mongodb+srv://'; 1041)
+[2025-04-15T20:57:59.640+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-04-15T20:57:59.676+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
