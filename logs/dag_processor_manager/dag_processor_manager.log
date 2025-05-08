@@ -1,0 +1,115 @@
+[2025-05-08T17:05:29.459+0000] {manager.py:469} INFO - Processing files using up to 2 processes at a time 
+[2025-05-08T17:05:29.460+0000] {manager.py:470} INFO - Process each file at most once every 30 seconds
+[2025-05-08T17:05:29.460+0000] {manager.py:471} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2025-05-08T17:05:29.461+0000] {manager.py:738} INFO - Searching for files in /opt/airflow/dags
+[2025-05-08T17:05:29.463+0000] {manager.py:741} INFO - There are 2 files in /opt/airflow/dags
+[2025-05-08T17:05:29.717+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  ----------
+/opt/airflow/dags/mymind_etl_dag.py                    91  0.05s             0           0
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py     90  0.18s             0           0
+================================================================================
+[2025-05-08T17:06:00.481+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                    99  0.00s             1           0  0.69s           2025-05-08T17:05:30
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py     98  0.02s             1           0  0.80s           2025-05-08T17:05:30
+================================================================================
+[2025-05-08T17:06:30.724+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   107  0.01s             1           0  0.16s           2025-05-08T17:06:00
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    106  0.02s             1           0  0.10s           2025-05-08T17:06:00
+================================================================================
+[2025-05-08T17:07:00.974+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   115  0.00s             1           0  0.16s           2025-05-08T17:06:30
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    114  0.01s             1           0  0.10s           2025-05-08T17:06:30
+================================================================================
+[2025-05-08T17:07:31.226+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   123  0.00s             1           0  0.18s           2025-05-08T17:07:01
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    122  0.01s             1           0  0.12s           2025-05-08T17:07:01
+================================================================================
+[2025-05-08T17:08:01.461+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   131  0.01s             1           0  0.17s           2025-05-08T17:07:31
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    130  0.02s             1           0  0.10s           2025-05-08T17:07:31
+================================================================================
+[2025-05-08T17:08:31.721+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   139  0.01s             1           0  0.17s           2025-05-08T17:08:01
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    138  0.02s             1           0  0.13s           2025-05-08T17:08:01
+================================================================================
+[2025-05-08T17:09:01.960+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   147  0.01s             1           0  0.17s           2025-05-08T17:08:31
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    146  0.02s             1           0  0.12s           2025-05-08T17:08:31
+================================================================================
+[2025-05-08T17:09:32.190+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   155  0.01s             1           0  0.16s           2025-05-08T17:09:02
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    154  0.02s             1           0  0.11s           2025-05-08T17:09:02
+================================================================================
+[2025-05-08T17:10:02.427+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   171  0.00s             1           0  0.16s           2025-05-08T17:09:32
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    170  0.02s             1           0  0.11s           2025-05-08T17:09:32
+================================================================================
+[2025-05-08T17:10:29.646+0000] {manager.py:738} INFO - Searching for files in /opt/airflow/dags
+[2025-05-08T17:10:29.649+0000] {manager.py:741} INFO - There are 2 files in /opt/airflow/dags
+[2025-05-08T17:10:32.703+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   179  0.01s             1           0  0.18s           2025-05-08T17:10:02
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    178  0.02s             1           0  0.12s           2025-05-08T17:10:02
+================================================================================
+[2025-05-08T17:11:02.947+0000] {manager.py:879} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                             PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+--------------------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/mymind_etl_dag.py                   187  0.01s             1           0  0.16s           2025-05-08T17:10:32
+/opt/airflow/dags/limpiar_logs_semanalmente_dag.py    186  0.02s             1           0  0.10s           2025-05-08T17:10:32
+================================================================================
