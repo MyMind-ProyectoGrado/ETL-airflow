@@ -36,7 +36,7 @@ def safe_bson_converter(obj):
 
 @dag(
     dag_id="mymind_mongo_to_mysql_etl",
-    schedule="*/5 * * * *", # Se ejecuta cada 5 minutos
+    schedule="* * * * *", # Se ejecuta cada minuto
     start_date=pendulum.datetime(2025, 4, 1, tz="UTC"),
     catchup=False,
     tags=["mymind", "etl", "mongodb", "mysql"],
@@ -173,16 +173,21 @@ def mymind_mongo_to_mysql_etl():
         log.info(f"Iniciando transformación de {len(mongo_docs)} documentos.")
         if not mongo_docs:
             log.info("No hay documentos para transformar.")
-            return {"users": [], "transcriptions": []}
+            return {"users": [], "transcriptions": [], "user_ids": [], "transcription_ids": []}
             
         users_rows = []
         transcriptions_rows = []
+        user_ids = []
+        transcription_ids = []
         
         for doc in mongo_docs:
             user_id = doc.get('_id')
             if not user_id:
                 log.warning(f"Documento omitido por falta de _id: {doc}")
                 continue # Saltar si no hay ID de usuario
+            
+            # Guardar ID del usuario para sincronización
+            user_ids.append(user_id)
                 
             # --- Preparar fila de usuario ---
             data_treatment = doc.get('data_treatment', {})
@@ -230,6 +235,9 @@ def mymind_mongo_to_mysql_etl():
                     if not transcription_id:
                         log.warning(f"Transcripción omitida por falta de _id en usuario {user_id}")
                         continue
+                    
+                    # Guardar ID de transcripción para sincronización
+                    transcription_ids.append(transcription_id)
                         
                     # Formatear fecha de transcripción
                     transcription_date_str = trans.get('date')
@@ -267,77 +275,174 @@ def mymind_mongo_to_mysql_etl():
                     transcriptions_rows.append(transcription_row)
                     
         log.info(f"Transformación completada: {len(users_rows)} filas de usuarios, {len(transcriptions_rows)} filas de transcripciones.")
-        return {"users": users_rows, "transcriptions": transcriptions_rows}
+        return {
+            "users": users_rows, 
+            "transcriptions": transcriptions_rows,
+            "user_ids": user_ids,
+            "transcription_ids": transcription_ids
+        }
 
     @task
-    def load_mysql_data(transformed_data: dict[str, list]):
+    def sync_and_load_mysql(transformed_data: dict[str, list]):
         """
-        Carga los datos transformados en las tablas de MySQL.
+        Sincroniza y carga los datos transformados en las tablas de MySQL.
+        1. Inserta/actualiza registros existentes
+        2. Elimina registros que ya no existen en MongoDB
         """
         users_to_load = transformed_data.get("users", [])
         transcriptions_to_load = transformed_data.get("transcriptions", [])
+        mongo_user_ids = transformed_data.get("user_ids", [])
+        mongo_transcription_ids = transformed_data.get("transcription_ids", [])
         
         if not users_to_load and not transcriptions_to_load:
             log.info("No hay datos transformados para cargar en MySQL.")
             return
             
-        log.info(f"Iniciando carga a MySQL: {len(users_to_load)} usuarios, {len(transcriptions_to_load)} transcripciones.")
+        log.info(f"Iniciando sincronización y carga a MySQL: {len(users_to_load)} usuarios, {len(transcriptions_to_load)} transcripciones.")
         mysql_hook = MySqlHook(mysql_conn_id=MYSQL_CONN_ID)
         
-        # --- Cargar Usuarios ---
-        if users_to_load:
-            user_target_fields = [
-                'user_id', 'name', 'email', 'profile_pic', 'birthdate', 'city',
-                'personality', 'university', 'degree', 'gender', 'notifications',
-                'accept_policies', 'acceptance_date', 'acceptance_ip', 'allow_anonimized_usage'
-            ]
+        # Usar una transacción para asegurar atomicidad
+        conn = mysql_hook.get_conn()
+        cursor = conn.cursor()
+        
+        try:
+            # Obtener IDs actuales desde MySQL
+            log.info("Obteniendo IDs actuales desde MySQL...")
+            cursor.execute(f"SELECT user_id FROM {MYSQL_USERS_TABLE}")
+            mysql_user_ids = [row[0] for row in cursor.fetchall()]
             
-            log.info(f"Cargando {len(users_to_load)} usuarios en la tabla {MYSQL_USERS_TABLE}...")
-            try:
-                mysql_hook.insert_rows(
-                    table=MYSQL_USERS_TABLE,
-                    rows=users_to_load,
-                    target_fields=user_target_fields,
-                    replace=True, # Usa REPLACE INTO... (Borra y re-inserta si PK existe)
-                )
+            cursor.execute(f"SELECT transcription_id FROM {MYSQL_TRANSCRIPTIONS_TABLE}")
+            mysql_transcription_ids = [row[0] for row in cursor.fetchall()]
+            
+            # Encontrar registros a eliminar (en MySQL pero no en MongoDB)
+            users_to_delete = [uid for uid in mysql_user_ids if uid not in mongo_user_ids]
+            transcriptions_to_delete = [tid for tid in mysql_transcription_ids if tid not in mongo_transcription_ids]
+            
+            log.info(f"Usuarios a eliminar: {len(users_to_delete)}")
+            log.info(f"Transcripciones a eliminar: {len(transcriptions_to_delete)}")
+            
+            # Deshabilitar temporalmente las verificaciones de clave foránea
+            cursor.execute("SET FOREIGN_KEY_CHECKS=0")
+            
+            # --- Eliminar transcripciones obsoletas ---
+            if transcriptions_to_delete:
+                format_strings = ','.join(['%s'] * len(transcriptions_to_delete))
+                delete_trans_sql = f"DELETE FROM {MYSQL_TRANSCRIPTIONS_TABLE} WHERE transcription_id IN ({format_strings})"
+                cursor.execute(delete_trans_sql, transcriptions_to_delete)
+                log.info(f"Se eliminaron {cursor.rowcount} transcripciones obsoletas.")
+            
+            # --- Eliminar usuarios obsoletos ---
+            if users_to_delete:
+                # Primero eliminar las transcripciones asociadas a estos usuarios
+                format_strings = ','.join(['%s'] * len(users_to_delete))
+                delete_trans_sql = f"DELETE FROM {MYSQL_TRANSCRIPTIONS_TABLE} WHERE user_id IN ({format_strings})"
+                cursor.execute(delete_trans_sql, users_to_delete)
+                log.info(f"Se eliminaron {cursor.rowcount} transcripciones de usuarios obsoletos.")
+                
+                # Luego eliminar los usuarios
+                delete_users_sql = f"DELETE FROM {MYSQL_USERS_TABLE} WHERE user_id IN ({format_strings})"
+                cursor.execute(delete_users_sql, users_to_delete)
+                log.info(f"Se eliminaron {cursor.rowcount} usuarios obsoletos.")
+            
+            # --- Cargar Usuarios ---
+            if users_to_load:
+                user_target_fields = [
+                    'user_id', 'name', 'email', 'profile_pic', 'birthdate', 'city',
+                    'personality', 'university', 'degree', 'gender', 'notifications',
+                    'accept_policies', 'acceptance_date', 'acceptance_ip', 'allow_anonimized_usage'
+                ]
+                
+                log.info(f"Cargando {len(users_to_load)} usuarios en la tabla {MYSQL_USERS_TABLE}...")
+                
+                # Usar INSERT ... ON DUPLICATE KEY UPDATE en lugar de REPLACE
+                user_sql = f"""
+                INSERT INTO {MYSQL_USERS_TABLE} 
+                ({', '.join(user_target_fields)}) 
+                VALUES ({', '.join(['%s'] * len(user_target_fields))})
+                ON DUPLICATE KEY UPDATE
+                name = VALUES(name),
+                email = VALUES(email),
+                profile_pic = VALUES(profile_pic),
+                birthdate = VALUES(birthdate),
+                city = VALUES(city),
+                personality = VALUES(personality),
+                university = VALUES(university),
+                degree = VALUES(degree),
+                gender = VALUES(gender),
+                notifications = VALUES(notifications),
+                accept_policies = VALUES(accept_policies),
+                acceptance_date = VALUES(acceptance_date),
+                acceptance_ip = VALUES(acceptance_ip),
+                allow_anonimized_usage = VALUES(allow_anonimized_usage)
+                """
+                
+                cursor.executemany(user_sql, users_to_load)
                 log.info("Usuarios cargados exitosamente.")
-            except Exception as e:
-                log.error(f"Error cargando usuarios: {e}", exc_info=True)
-                raise # Re-lanzar para que la tarea falle
-                
-        # --- Cargar Transcripciones con campos adicionales ---
-        if transcriptions_to_load:
-            # Actualizar los campos objetivo para incluir las probabilidades
-            transcription_target_fields = [
-                'transcription_id', 'user_id', 'transcription_date', 'transcription_time',
-                'text', 'emotion', 'sentiment', 'topic',
-                # Campos de probabilidades de emociones
-                'emotion_probs_joy', 'emotion_probs_anger', 'emotion_probs_sadness',
-                'emotion_probs_disgust', 'emotion_probs_fear', 'emotion_probs_neutral',
-                'emotion_probs_surprise', 'emotion_probs_trust', 'emotion_probs_anticipation',
-                # Campos de probabilidades de sentimiento
-                'sentiment_probs_positive', 'sentiment_probs_negative', 'sentiment_probs_neutral'
-            ]
             
-            log.info(f"Cargando {len(transcriptions_to_load)} transcripciones en la tabla {MYSQL_TRANSCRIPTIONS_TABLE}...")
-            try:
-                mysql_hook.insert_rows(
-                    table=MYSQL_TRANSCRIPTIONS_TABLE,
-                    rows=transcriptions_to_load,
-                    target_fields=transcription_target_fields,
-                    replace=True,
-                )
-                log.info("Transcripciones cargadas exitosamente.")
-            except Exception as e:
-                log.error(f"Error cargando transcripciones: {e}", exc_info=True)
-                raise # Re-lanzar para que la tarea falle
+            # --- Cargar Transcripciones ---
+            if transcriptions_to_load:
+                transcription_target_fields = [
+                    'transcription_id', 'user_id', 'transcription_date', 'transcription_time',
+                    'text', 'emotion', 'sentiment', 'topic',
+                    'emotion_probs_joy', 'emotion_probs_anger', 'emotion_probs_sadness',
+                    'emotion_probs_disgust', 'emotion_probs_fear', 'emotion_probs_neutral',
+                    'emotion_probs_surprise', 'emotion_probs_trust', 'emotion_probs_anticipation',
+                    'sentiment_probs_positive', 'sentiment_probs_negative', 'sentiment_probs_neutral'
+                ]
                 
-        log.info("Carga a MySQL completada con éxito.")
+                log.info(f"Cargando {len(transcriptions_to_load)} transcripciones en la tabla {MYSQL_TRANSCRIPTIONS_TABLE}...")
+                
+                # Usar INSERT ... ON DUPLICATE KEY UPDATE
+                trans_sql = f"""
+                INSERT INTO {MYSQL_TRANSCRIPTIONS_TABLE} 
+                ({', '.join(transcription_target_fields)}) 
+                VALUES ({', '.join(['%s'] * len(transcription_target_fields))})
+                ON DUPLICATE KEY UPDATE
+                user_id = VALUES(user_id),
+                transcription_date = VALUES(transcription_date),
+                transcription_time = VALUES(transcription_time),
+                text = VALUES(text),
+                emotion = VALUES(emotion),
+                sentiment = VALUES(sentiment),
+                topic = VALUES(topic),
+                emotion_probs_joy = VALUES(emotion_probs_joy),
+                emotion_probs_anger = VALUES(emotion_probs_anger),
+                emotion_probs_sadness = VALUES(emotion_probs_sadness),
+                emotion_probs_disgust = VALUES(emotion_probs_disgust),
+                emotion_probs_fear = VALUES(emotion_probs_fear),
+                emotion_probs_neutral = VALUES(emotion_probs_neutral),
+                emotion_probs_surprise = VALUES(emotion_probs_surprise),
+                emotion_probs_trust = VALUES(emotion_probs_trust),
+                emotion_probs_anticipation = VALUES(emotion_probs_anticipation),
+                sentiment_probs_positive = VALUES(sentiment_probs_positive),
+                sentiment_probs_negative = VALUES(sentiment_probs_negative),
+                sentiment_probs_neutral = VALUES(sentiment_probs_neutral)
+                """
+                
+                cursor.executemany(trans_sql, transcriptions_to_load)
+                log.info("Transcripciones cargadas exitosamente.")
+            
+            # Rehabilitar las verificaciones de clave foránea
+            cursor.execute("SET FOREIGN_KEY_CHECKS=1")
+            
+            # Confirmar la transacción
+            conn.commit()
+            log.info("Sincronización y carga a MySQL completada con éxito.")
+            
+        except Exception as e:
+            # Si hay un error, hacer rollback
+            conn.rollback()
+            log.error(f"Error durante la carga a MySQL: {e}", exc_info=True)
+            raise
+        finally:
+            # Asegurarse de cerrar el cursor y la conexión
+            cursor.close()
+            conn.close()
 
     # Definir flujo del DAG
     mongo_data = extract_mongo_data()
     transformed_data = transform_data(mongo_data)
-    load_mysql_data(transformed_data)
+    sync_and_load_mysql(transformed_data)
 
 # Instanciar el DAG
 mymind_mongo_to_mysql_etl()
