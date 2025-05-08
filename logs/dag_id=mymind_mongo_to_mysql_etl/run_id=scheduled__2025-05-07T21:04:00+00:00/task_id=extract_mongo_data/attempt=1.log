@@ -1,0 +1,74 @@
+[2025-05-07T21:05:00.502+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.extract_mongo_data scheduled__2025-05-07T21:04:00+00:00 [queued]>
+[2025-05-07T21:05:00.511+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.extract_mongo_data scheduled__2025-05-07T21:04:00+00:00 [queued]>
+[2025-05-07T21:05:00.511+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-07T21:05:00.526+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): extract_mongo_data> on 2025-05-07 21:04:00+00:00
+[2025-05-07T21:05:00.531+0000] {standard_task_runner.py:60} INFO - Started process 83505 to run task
+[2025-05-07T21:05:00.535+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'extract_mongo_data', 'scheduled__2025-05-07T21:04:00+00:00', '--job-id', '40512', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpipceh_z4']
+[2025-05-07T21:05:00.537+0000] {standard_task_runner.py:88} INFO - Job 40512: Subtask extract_mongo_data
+[2025-05-07T21:05:00.592+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.extract_mongo_data scheduled__2025-05-07T21:04:00+00:00 [running]> on host 52beca4b988b
+[2025-05-07T21:05:00.677+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='extract_mongo_data' AIRFLOW_CTX_EXECUTION_DATE='2025-05-07T21:04:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-07T21:04:00+00:00'
+[2025-05-07T21:05:00.678+0000] {mymind_etl_dag.py:59} INFO - Iniciando extracción desde MongoDB (usando MongoClient directo)...
+[2025-05-07T21:05:00.678+0000] {mymind_etl_dag.py:63} INFO - Obteniendo detalles de conexión para mongo_mymind...
+[2025-05-07T21:05:00.689+0000] {base.py:83} INFO - Using connection ID 'mongo_mymind' for task execution.
+[2025-05-07T21:05:00.689+0000] {mymind_etl_dag.py:94} INFO - URI de MongoDB construida correctamente.
+[2025-05-07T21:05:00.690+0000] {mymind_etl_dag.py:99} INFO - Timeouts - Connect: 10000ms, ServerSelect: 30000ms
+[2025-05-07T21:05:00.690+0000] {mymind_etl_dag.py:102} INFO - Creando instancia de MongoClient...
+[2025-05-07T21:05:00.695+0000] {warnings.py:109} WARNING - /home/***/.local/lib/python3.8/site-packages/pymongo/uri_parser.py:329: UserWarning: Unknown option: allow_insecure. Did you mean one of (tlsinsecure, tlsallowinvalidhostnames, tlsallowinvalidcertificates) or maybe a camelCase version of one? Refer to docstring.
+  return get_validated_options(opts, warn)
+
+[2025-05-07T21:05:00.981+0000] {mymind_etl_dag.py:112} INFO - Probando conexión con MongoDB (ping)...
+[2025-05-07T21:05:31.227+0000] {mymind_etl_dag.py:156} ERROR - Error de PyMongo al conectar o ejecutar operación: myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms), Timeout: 30.0s, Topology Description: <TopologyDescription id: 681bcafcf2688c8104afcfac, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('myminddb-users-shard-00-00.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-01.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-02.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>]>
+Traceback (most recent call last):
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 113, in extract_mongo_data
+    client.admin.command('ping')
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/database.py", line 926, in command
+    with self._client._conn_for_reads(read_preference, session, operation=command_name) as (
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 1701, in _conn_for_reads
+    server = self._select_server(read_preference, session, operation)
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms), Timeout: 30.0s, Topology Description: <TopologyDescription id: 681bcafcf2688c8104afcfac, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('myminddb-users-shard-00-00.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-01.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-02.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>]>
+[2025-05-07T21:05:31.230+0000] {mymind_etl_dag.py:164} INFO - Cerrando conexión MongoClient.
+[2025-05-07T21:05:31.231+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 113, in extract_mongo_data
+    client.admin.command('ping')
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/database.py", line 926, in command
+    with self._client._conn_for_reads(read_preference, session, operation=command_name) as (
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 1701, in _conn_for_reads
+    server = self._select_server(read_preference, session, operation)
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms), Timeout: 30.0s, Topology Description: <TopologyDescription id: 681bcafcf2688c8104afcfac, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('myminddb-users-shard-00-00.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-01.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-02.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>]>
+[2025-05-07T21:05:31.244+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=mymind_mongo_to_mysql_etl, task_id=extract_mongo_data, execution_date=20250507T210400, start_date=20250507T210500, end_date=20250507T210531
+[2025-05-07T21:05:31.265+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 40512 for task extract_mongo_data (myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms),myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms), Timeout: 30.0s, Topology Description: <TopologyDescription id: 681bcafcf2688c8104afcfac, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('myminddb-users-shard-00-00.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-00.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-01.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-01.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>, <ServerDescription ('myminddb-users-shard-00-02.cjeck.mongodb.net', 27017) server_type: Unknown, rtt: None, error=NetworkTimeout('myminddb-users-shard-00-02.cjeck.mongodb.net:27017: timed out (configured timeouts: socketTimeoutMS: 10000.0ms, connectTimeoutMS: 10000.0ms)')>]>; 83505)
+[2025-05-07T21:05:31.281+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-07T21:05:31.319+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
