@@ -2,10 +2,21 @@
 # Script para configurar la replicación MySQL
 
 echo "Esperando a que MySQL Master y Slave estén listos..."
-sleep 30
+sleep 10
 
 # Variables
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-rootpassword}
+
+# Verificar si ya hay una replicación activa
+SLAVE_STATUS=$(docker exec mysql_mymind_slave mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "SHOW SLAVE STATUS\G")
+SLAVE_IO_RUNNING=$(echo "$SLAVE_STATUS" | grep Slave_IO_Running | awk '{print $2}')
+SLAVE_SQL_RUNNING=$(echo "$SLAVE_STATUS" | grep Slave_SQL_Running | awk '{print $2}')
+
+if [ "$SLAVE_IO_RUNNING" == "Yes" ] && [ "$SLAVE_SQL_RUNNING" == "Yes" ]; then
+    echo "La replicación ya está configurada y funcionando. Saliendo."
+    exit 0
+fi
+
 
 # Paso 1: Crear las tablas en el slave si no existen
 echo "Asegurando que las tablas existan en el slave..."

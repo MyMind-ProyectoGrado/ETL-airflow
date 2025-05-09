@@ -36,7 +36,8 @@ def safe_bson_converter(obj):
 
 @dag(
     dag_id="mymind_mongo_to_mysql_etl",
-    schedule="* * * * *", # Se ejecuta cada minuto
+    # schedule="* * * * *", # Se ejecuta cada minuto
+    schedule="0 0,6,12,18 * * *", # Se ejecuta cada 6 horas
     start_date=pendulum.datetime(2025, 4, 1, tz="UTC"),
     catchup=False,
     tags=["mymind", "etl", "mongodb", "mysql"],
