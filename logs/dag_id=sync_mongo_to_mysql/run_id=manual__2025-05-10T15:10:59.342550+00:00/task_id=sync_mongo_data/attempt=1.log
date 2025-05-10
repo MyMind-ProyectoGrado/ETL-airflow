@@ -1,0 +1,36 @@
+[2025-05-10T15:11:00.184+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sync_mongo_to_mysql.sync_mongo_data manual__2025-05-10T15:10:59.342550+00:00 [queued]>
+[2025-05-10T15:11:00.193+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sync_mongo_to_mysql.sync_mongo_data manual__2025-05-10T15:10:59.342550+00:00 [queued]>
+[2025-05-10T15:11:00.194+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-10T15:11:00.209+0000] {taskinstance.py:2191} INFO - Executing <Task(PythonOperator): sync_mongo_data> on 2025-05-10 15:10:59.342550+00:00
+[2025-05-10T15:11:00.214+0000] {standard_task_runner.py:60} INFO - Started process 16962 to run task
+[2025-05-10T15:11:00.218+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'sync_mongo_to_mysql', 'sync_mongo_data', 'manual__2025-05-10T15:10:59.342550+00:00', '--job-id', '35883', '--raw', '--subdir', 'DAGS_FOLDER/mongo_to_mysql_dag.py', '--cfg-path', '/tmp/tmpman_9333']
+[2025-05-10T15:11:00.219+0000] {standard_task_runner.py:88} INFO - Job 35883: Subtask sync_mongo_data
+[2025-05-10T15:11:00.264+0000] {task_command.py:423} INFO - Running <TaskInstance: sync_mongo_to_mysql.sync_mongo_data manual__2025-05-10T15:10:59.342550+00:00 [running]> on host 75087a697e66
+[2025-05-10T15:11:00.344+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='sync_mongo_to_mysql' AIRFLOW_CTX_TASK_ID='sync_mongo_data' AIRFLOW_CTX_EXECUTION_DATE='2025-05-10T15:10:59.342550+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-05-10T15:10:59.342550+00:00'
+[2025-05-10T15:11:00.415+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/utils.py", line 27, in sync_mongo_to_mysql
+    mongo_docs = get_mongo_documents()
+  File "/opt/airflow/dags/utils.py", line 6, in get_mongo_documents
+    client = pymongo.MongoClient("mongodb+srv://usuario:password@cluster.mongodb.net")
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 780, in __init__
+    res = uri_parser.parse_uri(
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/uri_parser.py", line 558, in parse_uri
+    nodes = dns_resolver.get_hosts()
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/srv_resolver.py", line 140, in get_hosts
+    _, nodes = self._get_srv_response_and_hosts(True)
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/srv_resolver.py", line 120, in _get_srv_response_and_hosts
+    results = self._resolve_uri(encapsulate_errors)
+  File "/home/airflow/.local/lib/python3.8/site-packages/pymongo/srv_resolver.py", line 114, in _resolve_uri
+    raise ConfigurationError(str(exc)) from None
+pymongo.errors.ConfigurationError: The DNS query name does not exist: _mongodb._tcp.cluster.mongodb.net.
+[2025-05-10T15:11:00.426+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=sync_mongo_to_mysql, task_id=sync_mongo_data, execution_date=20250510T151059, start_date=20250510T151100, end_date=20250510T151100
+[2025-05-10T15:11:00.443+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35883 for task sync_mongo_data (The DNS query name does not exist: _mongodb._tcp.cluster.mongodb.net.; 16962)
+[2025-05-10T15:11:00.470+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-10T15:11:00.500+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
