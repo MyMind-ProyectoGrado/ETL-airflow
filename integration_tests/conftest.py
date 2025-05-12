@@ -7,15 +7,16 @@ import time
 from datetime import datetime
 import json
 import uuid
+import subprocess
 
-# Cargar variables de entorno
+# Load environment variables
 load_dotenv()
 
-# Configuraciones de bases de datos
+# Database configurations
 @pytest.fixture(scope="session")
 def mongo_config():
-    """Configuración de conexión a MongoDB."""
-    # Usar la URI de MongoDB Atlas en lugar de localhost
+    """MongoDB connection configuration."""
+    # Use MongoDB Atlas URI or your specific MongoDB URI
     return {
         "uri": os.getenv("MONGO_URI", "mongodb+srv://juanjogomezarenas1:KByyM1bcZmDvdTDn@myminddb-users.cjeck.mongodb.net/?retryWrites=true&w=majority&appName=myMindDB-Users"),
         "db_name": os.getenv("MONGO_DB_NAME", "myMindDB-Users"),
@@ -24,174 +25,166 @@ def mongo_config():
 
 @pytest.fixture(scope="session")
 def mysql_config():
-    """Configuración de conexión a MySQL."""
+    """MySQL connection configuration."""
     return {
         "host": "localhost",
-        "port": 3307,  # Puerto mapeado al host
+        "port": 3307,  # Port mapped to host
         "user": os.getenv("MYSQL_USER", "airflow_user"),
         "password": os.getenv("MYSQL_PASSWORD", "airflow_pass"),
-        "db": os.getenv("MYSQL_DB", "mymind_dw")
+        "db": os.getenv("MYSQL_DATABASE", "mymind_dw")
     }
 
 @pytest.fixture(scope="session")
 def mongo_client(mongo_config):
-    """Cliente de conexión a MongoDB."""
+    """MongoDB client connection."""
     client = pymongo.MongoClient(mongo_config["uri"])
     yield client
     client.close()
 
 @pytest.fixture(scope="session")
 def mongo_db(mongo_client, mongo_config):
-    """Base de datos MongoDB."""
+    """MongoDB database."""
     return mongo_client[mongo_config["db_name"]]
 
 @pytest.fixture(scope="session")
 def mongo_collection(mongo_db, mongo_config):
-    """Colección de MongoDB."""
+    """MongoDB collection."""
     return mongo_db[mongo_config["collection"]]
 
 @pytest.fixture(scope="session")
 def mysql_connection(mysql_config):
-    """Conexión a MySQL."""
-    conn = pymysql.connect(
-        host=mysql_config["host"],
-        port=mysql_config["port"],
-        user=mysql_config["user"],
-        password=mysql_config["password"],
-        database=mysql_config["db"]
-    )
-    yield conn
-    conn.close()
+    """MySQL connection."""
+    # Retry logic for MySQL connection
+    max_retries = 5
+    retry_delay = 2
 
-@pytest.fixture(scope="session")
+    for attempt in range(max_retries):
+        try:
+            conn = pymysql.connect(
+                host=mysql_config["host"],
+                port=mysql_config["port"],
+                user=mysql_config["user"],
+                password=mysql_config["password"],
+                database=mysql_config["db"],
+                charset='utf8mb4',
+                cursorclass=pymysql.cursors.DictCursor
+            )
+            print(f"✅ MySQL connection established successfully after {attempt+1} attempt(s)")
+            yield conn
+            conn.close()
+            break
+        except pymysql.Error as e:
+            if attempt < max_retries - 1:
+                print(f"MySQL connection attempt {attempt+1} failed: {e}. Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print(f"Failed to connect to MySQL after {max_retries} attempts: {e}")
+                raise
+
+@pytest.fixture(scope="function")
 def mysql_cursor(mysql_connection):
-    """Cursor de MySQL."""
-    cursor = mysql_connection.cursor(pymysql.cursors.DictCursor)
+    """MySQL cursor with automatic commits after test."""
+    cursor = mysql_connection.cursor()
     yield cursor
+    mysql_connection.commit()  # Commit any changes made during the test
     cursor.close()
-
-@pytest.fixture
-def sample_user_data():
-    """Datos de muestra para un usuario con transcripciones."""
-    # Usamos UUID en lugar de ObjectId para evitar problemas con bson
-    unique_id = str(uuid.uuid4())
-    timestamp = datetime.now().isoformat()
-    
-    return {
-        "_id": unique_id,
-        "name": f"ETL Test User {unique_id[:8]}",
-        "email": f"etl_test_{unique_id[:8]}@example.com",
-        "profilePic": "https://example.com/pic.jpg",
-        "birthdate": "1990-05-15T00:00:00",
-        "city": "Test City",
-        "personality": "Extrovertido",
-        "university": "Test University",
-        "degree": "Computer Science",
-        "gender": "Masculino",
-        "notifications": True,
-        "data_treatment": {
-            "accept_policies": True,
-            "acceptance_date": timestamp,
-            "acceptance_ip": "192.168.1.100",
-            "privacy_preferences": {
-                "allow_anonimized_usage": True
-            }
-        },
-        "transcriptions": [
-            {
-                "_id": str(uuid.uuid4()),
-                "date": timestamp.split("T")[0],
-                "time": timestamp.split("T")[1][:8],
-                "text": "Estoy muy feliz con los resultados de las pruebas.",
-                "emotion": "joy",
-                "emotionProbabilities": {
-                    "joy": 0.85,
-                    "anger": 0.02,
-                    "sadness": 0.03,
-                    "disgust": 0.01,
-                    "fear": 0.01,
-                    "neutral": 0.05,
-                    "surprise": 0.01,
-                    "trust": 0.01,
-                    "anticipation": 0.01
-                },
-                "sentiment": "positive",
-                "sentimentProbabilities": {
-                    "positive": 0.90,
-                    "negative": 0.05,
-                    "neutral": 0.05
-                },
-                "topic": "trabajo"
-            },
-            {
-                "_id": str(uuid.uuid4()),
-                "date": timestamp.split("T")[0],
-                "time": timestamp.split("T")[1][:8],
-                "text": "Me preocupa un poco la reunión de mañana.",
-                "emotion": "fear",
-                "emotionProbabilities": {
-                    "joy": 0.05,
-                    "anger": 0.10,
-                    "sadness": 0.15,
-                    "disgust": 0.05,
-                    "fear": 0.55,
-                    "neutral": 0.05,
-                    "surprise": 0.02,
-                    "trust": 0.02,
-                    "anticipation": 0.01
-                },
-                "sentiment": "negative",
-                "sentimentProbabilities": {
-                    "positive": 0.10,
-                    "negative": 0.70,
-                    "neutral": 0.20
-                },
-                "topic": "trabajo"
-            }
-        ]
-    }
-
-@pytest.fixture
-def insert_test_data(mongo_collection, sample_user_data):
-    """Inserta datos de prueba en MongoDB y los limpia después."""
-    # Insertar datos de prueba
-    mongo_collection.insert_one(sample_user_data)
-    
-    # Devolver ID para referencia y limpieza
-    user_id = sample_user_data["_id"]
-    transcription_ids = [t["_id"] for t in sample_user_data["transcriptions"]]
-    
-    yield user_id, transcription_ids
-    
-    # Limpiar después de la prueba
-    mongo_collection.delete_one({"_id": user_id})
 
 @pytest.fixture
 def airflow_dag_run():
     """
-    Ejecuta el DAG de ETL y espera a que termine.
+    Ejecuta el DAG de ETL en Airflow de manera automatizada.
     
-    Nota: Esta es una simulación simplificada. En un entorno real,
-    se usaría la API de Airflow para disparar y monitorear el DAG.
+    Retorna una función que puede ser llamada para ejecutar el DAG cuando sea necesario
+    durante las pruebas, con el tiempo de espera especificado.
     """
-    # Comando para ejecutar el DAG a través de la CLI de Airflow
-    # Este comando debe ejecutarse desde el entorno de Airflow
-    dag_id = "mymind_mongo_to_mysql_etl"
-    
-    # Crear la cadena JSON sin escape problemático
-    conf = json.dumps({"mock": "test"})
-    trigger_command = f"docker exec airflow-airflow-webserver-1 airflow dags trigger {dag_id} --conf '{conf}'"
-    
-    try:
-        # Ejecutar en shell
-        print(f"Ejecutando comando: {trigger_command}")
-        result = os.system(trigger_command)
-        print(f"Resultado del comando: {result}")
+    def _run_dag(wait_time=30):
+        """
+        Ejecuta el DAG de Airflow y espera el tiempo especificado.
         
-        # Dar tiempo a que el DAG se ejecute (en un entorno real, se verificaría el estado del DAG)
-        print(f"DAG {dag_id} disparado. Esperando 60 segundos para completar...")
-        time.sleep(60)  # Tiempo estimado para que el DAG complete
-        return True
-    except Exception as e:
-        print(f"Error al ejecutar el DAG: {str(e)}")
-        return False
+        Args:
+            wait_time: Tiempo de espera en segundos después de ejecutar el DAG
+        
+        Returns:
+            bool: True si el DAG se ejecutó correctamente, False en caso contrario
+        """
+        # Encontrar el nombre correcto del contenedor de Airflow
+        webserver_container = None
+        try:
+            # Listar contenedores que tengan 'airflow' y 'webserver' en su nombre
+            find_cmd = "docker ps | grep airflow | grep webserver | awk '{print $1}'"
+            containers = subprocess.run(find_cmd, shell=True, capture_output=True, text=True)
+            
+            if containers.stdout.strip():
+                webserver_container = containers.stdout.strip().split('\n')[0]
+                print(f"🔍 Contenedor de Airflow encontrado: {webserver_container}")
+            else:
+                webserver_container = "airflow-airflow-webserver-1"  # Nombre predeterminado
+                print(f"⚠️ No se encontraron contenedores de Airflow. Usando nombre predeterminado: {webserver_container}")
+        except Exception as e:
+            webserver_container = "airflow-airflow-webserver-1"  # Valor predeterminado
+            print(f"⚠️ Error al buscar contenedores: {str(e)}. Usando nombre predeterminado: {webserver_container}")
+        
+        # ID del DAG
+        dag_id = "mymind_mongo_to_mysql_etl"
+        
+        # Asegurarse de que la conexión a MySQL esté correctamente configurada
+        print("🔧 Configurando conexión a MySQL en Airflow...")
+        try:
+            # Eliminar la conexión existente si existe
+            del_cmd = f"docker exec {webserver_container} airflow connections delete mysql_mymind_dw"
+            subprocess.run(del_cmd, shell=True, capture_output=True, text=True)
+            
+            # Crear la nueva conexión
+            add_cmd = f"docker exec {webserver_container} airflow connections add mysql_mymind_dw " \
+                      f"--conn-type mysql " \
+                      f"--conn-login airflow_user " \
+                      f"--conn-password airflow_pass " \
+                      f"--conn-host mysql_mymind_master " \
+                      f"--conn-port 3306 " \
+                      f"--conn-schema mymind_dw"
+            
+            result = subprocess.run(add_cmd, shell=True, capture_output=True, text=True)
+            if result.returncode == 0:
+                print("✅ Conexión a MySQL configurada exitosamente")
+            else:
+                print(f"⚠️ Error al configurar la conexión: {result.stderr}")
+        except Exception as e:
+            print(f"⚠️ Error al configurar la conexión: {str(e)}")
+        
+        # Ejecutar el DAG
+        print(f"🚀 Ejecutando DAG: {dag_id}")
+        try:
+            # Opciones de comando para ejecutar el DAG
+            commands = [
+                f"docker exec {webserver_container} airflow dags trigger {dag_id}",
+                f"docker exec {webserver_container} airflow dags trigger -c '{{\"force\": true}}' {dag_id}",
+                f"docker exec {webserver_container} airflow dags backfill -s $(date +%Y-%m-%d) -e $(date +%Y-%m-%d) {dag_id}"
+            ]
+            
+            # Intentar cada comando hasta que uno funcione
+            for i, cmd in enumerate(commands):
+                print(f"🔄 Intento {i+1}: {cmd}")
+                result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    print(f"✅ DAG {dag_id} ejecutado exitosamente")
+                    break
+                else:
+                    print(f"⚠️ Error al ejecutar el DAG: {result.stderr}")
+                    
+                    # Si es el último intento y todos fallaron
+                    if i == len(commands) - 1:
+                        print("❌ Todos los intentos de ejecutar el DAG fallaron")
+                        return False
+            
+            # Esperar a que el DAG complete su ejecución
+            print(f"⏳ Esperando {wait_time} segundos para que el DAG complete su ejecución...")
+            time.sleep(wait_time)
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error inesperado al ejecutar el DAG: {str(e)}")
+            return False
+    
+    # Retornar la función de ejecución
+    return _run_dag

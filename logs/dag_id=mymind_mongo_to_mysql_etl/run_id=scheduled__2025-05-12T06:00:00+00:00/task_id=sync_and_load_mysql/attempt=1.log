@@ -1,0 +1,204 @@
+[2025-05-12T14:41:04.171+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T14:41:04.179+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T14:41:04.179+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-12T14:41:04.194+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-12 06:00:00+00:00
+[2025-05-12T14:41:04.199+0000] {standard_task_runner.py:60} INFO - Started process 130 to run task
+[2025-05-12T14:41:04.203+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'scheduled__2025-05-12T06:00:00+00:00', '--job-id', '35934', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpgq2z_ksd']
+[2025-05-12T14:41:04.204+0000] {standard_task_runner.py:88} INFO - Job 35934: Subtask sync_and_load_mysql
+[2025-05-12T14:41:04.251+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [running]> on host 404265e2b374
+[2025-05-12T14:41:04.349+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-12T06:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-12T06:00:00+00:00'
+[2025-05-12T14:41:04.350+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 6 usuarios, 22 transcripciones.
+[2025-05-12T14:41:04.358+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-12T14:41:04.388+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 306, in sync_and_load_mysql
+    conn = mysql_hook.get_conn()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/providers/mysql/hooks/mysql.py", line 195, in get_conn
+    return MySQLdb.connect(**conn_config)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 193, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (1045, "Access denied for user '***'@'172.21.0.9' (using password: YES)")
+[2025-05-12T14:41:04.398+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250512T060000, start_date=20250512T144104, end_date=20250512T144104
+[2025-05-12T14:41:04.408+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35934 for task sync_and_load_mysql ((1045, "Access denied for user '***'@'172.21.0.9' (using password: YES)"); 130)
+[2025-05-12T14:41:04.455+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-12T14:41:04.484+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-05-12T15:01:12.250+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:01:12.258+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:01:12.259+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-12T15:01:12.274+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-12 06:00:00+00:00
+[2025-05-12T15:01:12.279+0000] {standard_task_runner.py:60} INFO - Started process 465 to run task
+[2025-05-12T15:01:12.283+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'scheduled__2025-05-12T06:00:00+00:00', '--job-id', '35942', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpru1vmhkt']
+[2025-05-12T15:01:12.285+0000] {standard_task_runner.py:88} INFO - Job 35942: Subtask sync_and_load_mysql
+[2025-05-12T15:01:12.350+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [running]> on host 404265e2b374
+[2025-05-12T15:01:12.468+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-12T06:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-12T06:00:00+00:00'
+[2025-05-12T15:01:12.469+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 7 usuarios, 25 transcripciones.
+[2025-05-12T15:01:12.480+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-12T15:01:12.495+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 306, in sync_and_load_mysql
+    conn = mysql_hook.get_conn()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/providers/mysql/hooks/mysql.py", line 195, in get_conn
+    return MySQLdb.connect(**conn_config)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 193, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (1045, "Access denied for user 'mymind_user'@'172.21.0.9' (using password: YES)")
+[2025-05-12T15:01:12.506+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250512T060000, start_date=20250512T150112, end_date=20250512T150112
+[2025-05-12T15:01:12.520+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35942 for task sync_and_load_mysql ((1045, "Access denied for user 'mymind_user'@'172.21.0.9' (using password: YES)"); 465)
+[2025-05-12T15:01:12.535+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-12T15:01:12.564+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-05-12T15:04:13.780+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:04:13.788+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:04:13.788+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-12T15:04:13.802+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-12 06:00:00+00:00
+[2025-05-12T15:04:13.806+0000] {standard_task_runner.py:60} INFO - Started process 531 to run task
+[2025-05-12T15:04:13.810+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'scheduled__2025-05-12T06:00:00+00:00', '--job-id', '35948', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpnghz14g8']
+[2025-05-12T15:04:13.811+0000] {standard_task_runner.py:88} INFO - Job 35948: Subtask sync_and_load_mysql
+[2025-05-12T15:04:13.871+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [running]> on host 404265e2b374
+[2025-05-12T15:04:13.984+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-12T06:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-12T06:00:00+00:00'
+[2025-05-12T15:04:13.985+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 7 usuarios, 25 transcripciones.
+[2025-05-12T15:04:13.996+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-12T15:04:14.019+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 306, in sync_and_load_mysql
+    conn = mysql_hook.get_conn()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/providers/mysql/hooks/mysql.py", line 195, in get_conn
+    return MySQLdb.connect(**conn_config)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 193, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)")
+[2025-05-12T15:04:14.030+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250512T060000, start_date=20250512T150413, end_date=20250512T150414
+[2025-05-12T15:04:14.047+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35948 for task sync_and_load_mysql ((1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)"); 531)
+[2025-05-12T15:04:14.062+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-12T15:04:14.091+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-05-12T15:04:44.064+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:04:44.073+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:04:44.073+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-12T15:04:44.088+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-12 06:00:00+00:00
+[2025-05-12T15:04:44.093+0000] {standard_task_runner.py:60} INFO - Started process 552 to run task
+[2025-05-12T15:04:44.097+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'scheduled__2025-05-12T06:00:00+00:00', '--job-id', '35951', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpzlc6xk_f']
+[2025-05-12T15:04:44.098+0000] {standard_task_runner.py:88} INFO - Job 35951: Subtask sync_and_load_mysql
+[2025-05-12T15:04:44.156+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [running]> on host 404265e2b374
+[2025-05-12T15:04:44.268+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-12T06:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-12T06:00:00+00:00'
+[2025-05-12T15:04:44.270+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 7 usuarios, 25 transcripciones.
+[2025-05-12T15:04:44.282+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-12T15:04:44.307+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 306, in sync_and_load_mysql
+    conn = mysql_hook.get_conn()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/providers/mysql/hooks/mysql.py", line 195, in get_conn
+    return MySQLdb.connect(**conn_config)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 193, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)")
+[2025-05-12T15:04:44.319+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250512T060000, start_date=20250512T150444, end_date=20250512T150444
+[2025-05-12T15:04:44.335+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35951 for task sync_and_load_mysql ((1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)"); 552)
+[2025-05-12T15:04:44.349+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-12T15:04:44.379+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-05-12T15:08:17.054+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:08:17.063+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:08:17.063+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-12T15:08:17.076+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-12 06:00:00+00:00
+[2025-05-12T15:08:17.081+0000] {standard_task_runner.py:60} INFO - Started process 630 to run task
+[2025-05-12T15:08:17.084+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'scheduled__2025-05-12T06:00:00+00:00', '--job-id', '35955', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpwm4stj5p']
+[2025-05-12T15:08:17.086+0000] {standard_task_runner.py:88} INFO - Job 35955: Subtask sync_and_load_mysql
+[2025-05-12T15:08:17.146+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [running]> on host 404265e2b374
+[2025-05-12T15:08:17.262+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-12T06:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-12T06:00:00+00:00'
+[2025-05-12T15:08:17.263+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 7 usuarios, 25 transcripciones.
+[2025-05-12T15:08:17.274+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-12T15:08:17.293+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 306, in sync_and_load_mysql
+    conn = mysql_hook.get_conn()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/providers/mysql/hooks/mysql.py", line 195, in get_conn
+    return MySQLdb.connect(**conn_config)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 193, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)")
+[2025-05-12T15:08:17.304+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250512T060000, start_date=20250512T150817, end_date=20250512T150817
+[2025-05-12T15:08:17.319+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35955 for task sync_and_load_mysql ((1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)"); 630)
+[2025-05-12T15:08:17.336+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-12T15:08:17.362+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-05-12T15:09:47.210+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:09:47.217+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [queued]>
+[2025-05-12T15:09:47.218+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-12T15:09:47.232+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-12 06:00:00+00:00
+[2025-05-12T15:09:47.237+0000] {standard_task_runner.py:60} INFO - Started process 671 to run task
+[2025-05-12T15:09:47.240+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'scheduled__2025-05-12T06:00:00+00:00', '--job-id', '35960', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmp6f1okgip']
+[2025-05-12T15:09:47.242+0000] {standard_task_runner.py:88} INFO - Job 35960: Subtask sync_and_load_mysql
+[2025-05-12T15:09:47.293+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql scheduled__2025-05-12T06:00:00+00:00 [running]> on host 404265e2b374
+[2025-05-12T15:09:47.407+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-12T06:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-05-12T06:00:00+00:00'
+[2025-05-12T15:09:47.408+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 7 usuarios, 25 transcripciones.
+[2025-05-12T15:09:47.421+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-12T15:09:47.438+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 306, in sync_and_load_mysql
+    conn = mysql_hook.get_conn()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/providers/mysql/hooks/mysql.py", line 195, in get_conn
+    return MySQLdb.connect(**conn_config)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/__init__.py", line 121, in Connect
+    return Connection(*args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 193, in __init__
+    super().__init__(*args, **kwargs2)
+MySQLdb.OperationalError: (1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)")
+[2025-05-12T15:09:47.447+0000] {taskinstance.py:1138} INFO - Marking task as UP_FOR_RETRY. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250512T060000, start_date=20250512T150947, end_date=20250512T150947
+[2025-05-12T15:09:47.459+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 35960 for task sync_and_load_mysql ((1045, "Access denied for user '***_user'@'172.21.0.9' (using password: YES)"); 671)
+[2025-05-12T15:09:47.492+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-12T15:09:47.522+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

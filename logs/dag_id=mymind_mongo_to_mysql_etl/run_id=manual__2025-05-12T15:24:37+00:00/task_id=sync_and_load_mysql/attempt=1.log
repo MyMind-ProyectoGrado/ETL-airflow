@@ -1,0 +1,23 @@
+[2025-05-12T15:24:42.679+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql manual__2025-05-12T15:24:37+00:00 [queued]>
+[2025-05-12T15:24:42.689+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql manual__2025-05-12T15:24:37+00:00 [queued]>
+[2025-05-12T15:24:42.689+0000] {taskinstance.py:2170} INFO - Starting attempt 1 of 2
+[2025-05-12T15:24:42.703+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-12 15:24:37+00:00
+[2025-05-12T15:24:42.708+0000] {standard_task_runner.py:60} INFO - Started process 259 to run task
+[2025-05-12T15:24:42.711+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'manual__2025-05-12T15:24:37+00:00', '--job-id', '35975', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpd5dq2nle']
+[2025-05-12T15:24:42.713+0000] {standard_task_runner.py:88} INFO - Job 35975: Subtask sync_and_load_mysql
+[2025-05-12T15:24:42.758+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql manual__2025-05-12T15:24:37+00:00 [running]> on host 05e28894127a
+[2025-05-12T15:24:42.869+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-12T15:24:37+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-05-12T15:24:37+00:00'
+[2025-05-12T15:24:42.870+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 8 usuarios, 27 transcripciones.
+[2025-05-12T15:24:42.880+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-12T15:24:42.889+0000] {mymind_etl_dag.py:311} INFO - Obteniendo IDs actuales desde MySQL...
+[2025-05-12T15:24:42.891+0000] {mymind_etl_dag.py:322} INFO - Usuarios a eliminar: 0
+[2025-05-12T15:24:42.891+0000] {mymind_etl_dag.py:323} INFO - Transcripciones a eliminar: 0
+[2025-05-12T15:24:42.891+0000] {mymind_etl_dag.py:356} INFO - Cargando 8 usuarios en la tabla users...
+[2025-05-12T15:24:42.893+0000] {mymind_etl_dag.py:381} INFO - Usuarios cargados exitosamente.
+[2025-05-12T15:24:42.893+0000] {mymind_etl_dag.py:394} INFO - Cargando 27 transcripciones en la tabla transcriptions...
+[2025-05-12T15:24:42.898+0000] {mymind_etl_dag.py:424} INFO - Transcripciones cargadas exitosamente.
+[2025-05-12T15:24:42.901+0000] {mymind_etl_dag.py:431} INFO - Sincronización y carga a MySQL completada con éxito.
+[2025-05-12T15:24:42.901+0000] {python.py:201} INFO - Done. Returned value was: None
+[2025-05-12T15:24:42.912+0000] {taskinstance.py:1138} INFO - Marking task as SUCCESS. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250512T152437, start_date=20250512T152442, end_date=20250512T152442
+[2025-05-12T15:24:42.963+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 0
+[2025-05-12T15:24:42.996+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check
