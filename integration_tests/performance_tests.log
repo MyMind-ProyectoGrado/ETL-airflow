@@ -1,0 +1,45 @@
+2025-05-12 16:31:07,639 - INFO - ======== IT-09-01: Tiempo de respuesta de transcripción ========
+2025-05-12 16:31:07,639 - INFO - Realizando solicitud de transcripción a http://localhost:9080/transcription/add-transcription/text
+2025-05-12 16:31:08,197 - INFO - Tiempo de respuesta: 0.56s
+2025-05-12 16:31:31,551 - INFO - ======== IT-09-01: Tiempo de respuesta de transcripción ========
+2025-05-12 16:31:31,551 - INFO - Realizando solicitud de transcripción a http://localhost:9080/transcription/add-transcription/text
+2025-05-12 16:31:31,951 - INFO - Tiempo de respuesta: 0.40s
+2025-05-12 16:40:43,598 - INFO - ======== IT-09-01: Tiempo de respuesta de transcripción ========
+2025-05-12 16:40:43,598 - INFO - Realizando solicitud de transcripción a http://localhost:9080/transcription/add-transcription/text
+2025-05-12 16:40:44,447 - INFO - Tiempo de respuesta: 0.85s
+2025-05-12 16:40:44,447 - INFO - Código de estado: 200
+2025-05-12 16:40:44,447 - INFO - ✅ Solicitud exitosa
+2025-05-12 16:40:44,447 - INFO - ======== IT-09-02: Tiempo de respuesta de consulta ========
+2025-05-12 16:40:44,447 - INFO - Realizando consulta de historial a http://localhost:9080/users/transcriptions/
+2025-05-12 16:40:45,075 - INFO - Tiempo de respuesta: 0.63s
+2025-05-12 16:40:45,075 - INFO - Código de estado: 200
+2025-05-12 16:40:45,076 - INFO - ✅ Solicitud exitosa
+2025-05-12 16:40:45,076 - INFO - ======== IT-09-03: Tiempo de actualización de reportes ========
+2025-05-12 16:40:45,076 - INFO - Realizando solicitud de reporte a http://localhost:9080/transcriptions/user/last-7-days
+2025-05-12 16:40:45,782 - INFO - Tiempo de respuesta: 0.71s
+2025-05-12 16:40:45,782 - INFO - Código de estado: 200
+2025-05-12 16:40:45,782 - INFO - ✅ Solicitud exitosa
+2025-05-12 16:40:45,783 - INFO - ======== IT-10-01: Disponibilidad bajo carga baja (10 usuarios) ========
+2025-05-12 16:40:45,783 - INFO - Ejecutando 10 solicitudes concurrentes a http://localhost:9080/users/profile
+2025-05-12 16:40:47,052 - INFO - Total de solicitudes: 10
+2025-05-12 16:40:47,052 - INFO - Solicitudes exitosas: 10
+2025-05-12 16:40:47,052 - INFO - Solicitudes fallidas: 0
+2025-05-12 16:40:47,053 - INFO - Tasa de éxito: 100.00%
+2025-05-12 16:40:47,053 - INFO - Tiempo promedio de respuesta: 0.54s
+2025-05-12 16:40:47,053 - INFO - ✅ Prueba de carga baja superada
+2025-05-12 16:40:47,053 - INFO - ======== IT-10-02: Disponibilidad bajo carga media (50 usuarios) ========
+2025-05-12 16:40:47,054 - INFO - Ejecutando 50 solicitudes concurrentes a http://localhost:9080/users/profile
+2025-05-12 16:40:48,322 - INFO - Total de solicitudes: 50
+2025-05-12 16:40:48,322 - INFO - Solicitudes exitosas: 50
+2025-05-12 16:40:48,323 - INFO - Solicitudes fallidas: 0
+2025-05-12 16:40:48,323 - INFO - Tasa de éxito: 100.00%
+2025-05-12 16:40:48,323 - INFO - Tiempo promedio de respuesta: 0.60s
+2025-05-12 16:40:48,323 - INFO - ✅ Prueba de carga media superada
+2025-05-12 16:40:48,323 - INFO - ======== IT-10-03: Disponibilidad bajo carga alta (100 usuarios) ========
+2025-05-12 16:40:48,323 - INFO - Ejecutando 100 solicitudes concurrentes a http://localhost:9080/users/profile
+2025-05-12 16:40:49,600 - INFO - Total de solicitudes: 100
+2025-05-12 16:40:49,601 - INFO - Solicitudes exitosas: 100
+2025-05-12 16:40:49,601 - INFO - Solicitudes fallidas: 0
+2025-05-12 16:40:49,601 - INFO - Tasa de éxito: 100.00%
+2025-05-12 16:40:49,601 - INFO - Tiempo promedio de respuesta: 0.60s
+2025-05-12 16:40:49,601 - INFO - ✅ Prueba de carga alta superada

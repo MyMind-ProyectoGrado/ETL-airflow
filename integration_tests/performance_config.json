@@ -1,0 +1,35 @@
+{
+  "endpoints": [
+    {
+      "type": "transcription",
+      "name": "Transcripción de audio",
+      "url": "http://localhost:9080/transcription/add-transcription/text",
+      "method": "POST",
+      "data": {
+        "text": "Este es un texto de prueba para medir el tiempo de respuesta del sistema de transcripción"
+      },
+      "expected_response_time": 10
+    },
+    {
+      "type": "history",
+      "name": "Consulta de historial",
+      "url": "http://localhost:9080/users/transcriptions/",
+      "method": "GET",
+      "expected_response_time": 2
+    },
+    {
+      "type": "report",
+      "name": "Actualización de reporte",
+      "url": "http://localhost:9080/transcriptions/user/last-7-days",
+      "method": "GET",
+      "expected_response_time": 30
+    },
+    {
+      "type": "load_test",
+      "name": "Endpoint para prueba de carga",
+      "url": "http://localhost:9080/users/profile",
+      "method": "GET",
+      "expected_response_time": 2
+    }
+  ]
+}
