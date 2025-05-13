@@ -1,0 +1,48 @@
+[2025-05-13T15:13:48.413+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql manual__2025-05-13T15:08:42.648421+00:00 [queued]>
+[2025-05-13T15:13:48.422+0000] {taskinstance.py:1956} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql manual__2025-05-13T15:08:42.648421+00:00 [queued]>
+[2025-05-13T15:13:48.423+0000] {taskinstance.py:2170} INFO - Starting attempt 2 of 2
+[2025-05-13T15:13:48.437+0000] {taskinstance.py:2191} INFO - Executing <Task(_PythonDecoratedOperator): sync_and_load_mysql> on 2025-05-13 15:08:42.648421+00:00
+[2025-05-13T15:13:48.443+0000] {standard_task_runner.py:60} INFO - Started process 16889 to run task
+[2025-05-13T15:13:48.447+0000] {standard_task_runner.py:87} INFO - Running: ['***', 'tasks', 'run', 'mymind_mongo_to_mysql_etl', 'sync_and_load_mysql', 'manual__2025-05-13T15:08:42.648421+00:00', '--job-id', '36045', '--raw', '--subdir', 'DAGS_FOLDER/mymind_etl_dag.py', '--cfg-path', '/tmp/tmpfjm1wlsl']
+[2025-05-13T15:13:48.448+0000] {standard_task_runner.py:88} INFO - Job 36045: Subtask sync_and_load_mysql
+[2025-05-13T15:13:48.505+0000] {task_command.py:423} INFO - Running <TaskInstance: mymind_mongo_to_mysql_etl.sync_and_load_mysql manual__2025-05-13T15:08:42.648421+00:00 [running]> on host 2c8ed1353217
+[2025-05-13T15:13:48.624+0000] {taskinstance.py:2480} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='mymind_mongo_to_mysql_etl' AIRFLOW_CTX_TASK_ID='sync_and_load_mysql' AIRFLOW_CTX_EXECUTION_DATE='2025-05-13T15:08:42.648421+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-05-13T15:08:42.648421+00:00'
+[2025-05-13T15:13:48.625+0000] {mymind_etl_dag.py:302} INFO - Iniciando sincronización y carga a MySQL: 7 usuarios, 31 transcripciones.
+[2025-05-13T15:13:48.635+0000] {base.py:83} INFO - Using connection ID 'mysql_mymind_dw' for task execution.
+[2025-05-13T15:13:48.646+0000] {mymind_etl_dag.py:311} INFO - Obteniendo IDs actuales desde MySQL...
+[2025-05-13T15:13:48.647+0000] {mymind_etl_dag.py:322} INFO - Usuarios a eliminar: 4
+[2025-05-13T15:13:48.647+0000] {mymind_etl_dag.py:323} INFO - Transcripciones a eliminar: 2
+[2025-05-13T15:13:48.648+0000] {mymind_etl_dag.py:436} ERROR - Error durante la carga a MySQL: (1290, 'The MySQL server is running with the --read-only option so it cannot execute this statement')
+Traceback (most recent call last):
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 332, in sync_and_load_mysql
+    cursor.execute(delete_trans_sql, transcriptions_to_delete)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 257, in query
+    _mysql.connection.query(self, query)
+MySQLdb.OperationalError: (1290, 'The MySQL server is running with the --read-only option so it cannot execute this statement')
+[2025-05-13T15:13:48.649+0000] {taskinstance.py:2698} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 433, in _execute_task
+    result = execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/decorators/base.py", line 241, in execute
+    return_value = super().execute(context)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 199, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/python.py", line 216, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/mymind_etl_dag.py", line 332, in sync_and_load_mysql
+    cursor.execute(delete_trans_sql, transcriptions_to_delete)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/cursors.py", line 179, in execute
+    res = self._query(mogrified_query)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/cursors.py", line 330, in _query
+    db.query(q)
+  File "/home/airflow/.local/lib/python3.8/site-packages/MySQLdb/connections.py", line 257, in query
+    _mysql.connection.query(self, query)
+MySQLdb.OperationalError: (1290, 'The MySQL server is running with the --read-only option so it cannot execute this statement')
+[2025-05-13T15:13:48.659+0000] {taskinstance.py:1138} INFO - Marking task as FAILED. dag_id=mymind_mongo_to_mysql_etl, task_id=sync_and_load_mysql, execution_date=20250513T150842, start_date=20250513T151348, end_date=20250513T151348
+[2025-05-13T15:13:48.674+0000] {standard_task_runner.py:107} ERROR - Failed to execute job 36045 for task sync_and_load_mysql ((1290, 'The MySQL server is running with the --read-only option so it cannot execute this statement'); 16889)
+[2025-05-13T15:13:48.698+0000] {local_task_job_runner.py:234} INFO - Task exited with return code 1
+[2025-05-13T15:13:48.729+0000] {taskinstance.py:3280} INFO - 0 downstream tasks scheduled from follow-on schedule check

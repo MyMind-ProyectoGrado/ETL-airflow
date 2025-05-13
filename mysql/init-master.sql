@@ -45,3 +45,24 @@ CREATE TABLE IF NOT EXISTS transcriptions (
     sentiment_probs_neutral FLOAT,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 ) ENGINE=InnoDB;
+
+CREATE OR REPLACE VIEW study_data AS
+SELECT 
+    t.text AS Transcripción,
+    t.emotion AS Emoción,
+    t.sentiment AS Sentimiento,
+    TIMESTAMPDIFF(YEAR, u.birthdate, CURDATE()) AS Edad,
+    u.city AS 'Ciudad/Localidad',
+    u.personality AS Personalidad,
+    u.university AS Universidad,
+    u.degree AS Carrera,
+    u.gender AS Sexo
+FROM 
+    transcriptions t
+JOIN 
+    users u ON t.user_id = u.user_id
+WHERE 
+    u.accept_policies = 1
+ORDER BY 
+    t.transcription_date DESC, 
+    t.transcription_time DESC;
