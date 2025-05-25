@@ -1,5 +1,0 @@
-pytest
-pymongo
-pymysql
-python-dotenv
-pytest-cov

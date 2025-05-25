@@ -1,8 +1,0 @@
-# requirements.txt
-pendulum
-pymongo
-apache-airflow
-apache-airflow-providers-mysql
-pytest
-pytest-cov
-certifi
